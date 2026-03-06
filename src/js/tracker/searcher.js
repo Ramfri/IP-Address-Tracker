@@ -1,6 +1,6 @@
-
 export class Searcher {
-    BASEURL = '/api/';
+    BASEURL= '/api/';
+    FIELDS = '?fields=status,regionName,city,district,zip,lat,lon,offset,isp,query';
     savedResults = {};
     searchHistory = new Set();
 
@@ -16,32 +16,76 @@ export class Searcher {
         return ipv4Regex.test(ip) || ipv6Regex.test(ip);
     }
 
+    async start() {
+        const url = 'https://ipapi.co/json/';
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+            const result = await response.json();
+            const {isValid , data } = this.#startHelper(result);
+
+            if (isValid === false) {
+                throw new Error("Datos de la API inválidos o incompletos");
+            }
+
+            this.#saveResult(data.ipAddress, data);
+            return {
+                success: true,
+                data: data
+            }
+        } catch (error) {
+            return await this.search('');
+        }
+    }
+    
+    #startHelper({latitude, longitude, ip, city, region, postal, utc_offset, org}) {
+        if(typeof latitude !== 'number' || typeof longitude !== 'number'){
+            return { isValid : false , data : {}};
+        };
+
+        const offsetHours = utc_offset ? Number(utc_offset.slice(0, 3)): null;
+
+        return {
+            isValid: true,
+            data: {
+                ipAddress: ip,
+                location: `${city}, ${region} ${postal}`,
+                timezone: `UTC ${offsetHours}:00`,
+                isp: org,
+                lat: latitude,
+                lon: longitude,
+            }
+        };
+    }
+
     async search(ipAddress) {
+        
         if (this.searchHistory.has(ipAddress)) {
             return {
                 success: true,
                 data: this.savedResults[ipAddress]
             };
         }
-
+        
         try {
-            const url = `${this.BASEURL}${ipAddress}`;
+            const url = `${this.BASEURL}${ipAddress}${this.FIELDS}`;
             const response = await fetch(url);
-
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
             }
-
             const result = await response.json();
+            const {isValid , data } = this.#validResponse(result);
 
-            if (this.#validResponse(result) === false) {
+            if (isValid === false) {
                 throw new Error("Datos de la API inválidos o incompletos");
             }
 
-            this.#saveResult(ipAddress, result);
+            this.#saveResult(ipAddress, data);
             return {
                 success: true,
-                data: result
+                data: data
             }
         } catch (error) {
             return {
@@ -51,20 +95,35 @@ export class Searcher {
         }
     }
 
-    #validResponse(result) {
-        if (!result) return false;
+    #validResponse({lat, lon, query, city, regionName, zip, offset, isp}) {
+        if(typeof lat !== 'number' || typeof lon !== 'number'){
+            return { isValid : false , data : {}};
+        };
 
-        if (result.status !== "success") return false;
+        return {
+            isValid: true,
+            data: {
+                ipAddress: query,
+                location: `${city}, ${regionName} ${zip}`,
+                timezone: this.#secondOffsetToHours(offset),
+                isp: isp,
+                lat: lat,
+                lon: lon,
+            }
+        };
+    }
 
-        if (!result.query || !result.city || !result.regionName || !result.zip || !result.timezone || !result.isp) {
-            return false;
-        }
+    #secondOffsetToHours(offset) {
+        const head = 'UTC ';
+        const tail = ':00'
 
-        if (result.lat === undefined || result.lon === undefined) {
-            return false;
-        }
 
-        return true;
+        if(offset === 0) return head + '00' + tail;
+
+        const sign  = offset > 0 ? '+' : '-';
+        const hours = String(offset / 3600);
+
+        return head + sign + hours + tail;
     }
 
     #saveResult(ipAddress, result) {

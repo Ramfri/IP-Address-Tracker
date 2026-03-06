@@ -53,11 +53,10 @@ export class Tracker {
         this.interface.searchTrigger.addEventListener('click', debouncedSearch);
 
         
-        const { success, data } = await this.searcher.search('');
+        const { success, data } = await this.searcher.start('');
         if(success) {
             this.lastSearch = data.ip; 
             this.interface.showResults(data);
         }
-
     }
 }

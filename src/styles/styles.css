@@ -62,7 +62,7 @@ input {
 
     .locationInfo {
         position: absolute;
-        top: 50%;
+        top: 54%;
         z-index: 1000;
         background-color: #ffffff;
         width: min(90%, 55rem);
@@ -102,7 +102,7 @@ input {
 
 .search {
     width: min(90%, 55rem);
-    height: 5rem;
+    height: 6rem;
     border-radius: 1.5rem;
     overflow: hidden;
     display: flex;
@@ -135,14 +135,19 @@ input {
 }
 
 #map {
+    min-height: 50rem;
     height: calc(100dvh - 25rem);
-    min-height: 60rem;
+    
 }
 
 @media (min-width: 1201px) {
     .header {
         background-image: url('../images/pattern-bg-desktop.png');
         height: 25rem;
+
+        .title{
+            font-size: 3rem;
+        }
 
         .locationInfo {
             padding: 3rem 0;
@@ -169,9 +174,10 @@ input {
                 }
 
                 span {
-                    font-size: 1.8rem;
+                    font-size: 2rem;
                 }
             }
         }
     }
 }
+

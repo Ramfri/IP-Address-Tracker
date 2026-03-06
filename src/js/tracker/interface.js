@@ -59,10 +59,8 @@ export class Interface {
     }
 
     showResults(data) {
-        const filteredData = this.#getDataForUI(data);
-
         for (const elementName in this.resultsInterface) {
-            const textData = filteredData[elementName];
+            const textData = data[elementName];
             const element = this.resultsInterface[elementName];
 
             if (textData === '') {
@@ -71,12 +69,8 @@ export class Interface {
                 this.#showElement(element);
                 element.innerText = textData;
             }
-
-
         }
-
-        const { lat, lon } = data;
-        this.#updateMap(lat, lon);
+        this.#updateMap(data.lat, data.lon);
     }
 
     #showElement(element) {
@@ -88,15 +82,6 @@ export class Interface {
         if (element.classList.contains('hide')) return;
 
         element.classList.add('hide');
-    }
-
-    #getDataForUI(data) {
-        return {
-            ipAddress: data.query,
-            location: `${data.city}, ${data.regionName} ${data.zip}`,
-            timezone: `${data.timezone}`,
-            isp: data.isp
-        }
     }
 
     #updateMap(lat, lng) {
