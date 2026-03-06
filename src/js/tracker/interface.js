@@ -13,7 +13,7 @@ export class Interface {
         };
 
         this.resultsInterface = {
-            ipAddress : document.getElementById('ipAddress'),
+            ipAddress: document.getElementById('ipAddress'),
             location: document.getElementById('location'),
             timezone: document.getElementById('timezone'),
             isp: document.getElementById('ISP'),
@@ -60,30 +60,48 @@ export class Interface {
 
     showResults(data) {
         const filteredData = this.#getDataForUI(data);
-        
+
         for (const elementName in this.resultsInterface) {
             const textData = filteredData[elementName];
             const element = this.resultsInterface[elementName];
-            element.innerText = textData;
+
+            if (textData === '') {
+                this.#hideElement(element);
+            } else {
+                this.#showElement(element);
+                element.innerText = textData;
+            }
+
+
         }
 
-        const { lat, lng } = data.location;
-        this.#updateMap(lat, lng);
+        const { lat, lon } = data;
+        this.#updateMap(lat, lon);
+    }
+
+    #showElement(element) {
+        if (!element.classList.contains('hide')) return;
+        element.classList.remove('hide');
+    }
+
+    #hideElement(element) {
+        if (element.classList.contains('hide')) return;
+
+        element.classList.add('hide');
     }
 
     #getDataForUI(data) {
-        const {ip, location, isp} = data;
-
         return {
-            ipAddress : ip,
-            location : `${location.city}, ${location.region} ${location.postalCode}`,
-            timezone : `UTC ${location.timezone}`,
-            isp : data.isp
+            ipAddress: data.query,
+            location: `${data.city}, ${data.regionName} ${data.zip}`,
+            timezone: `${data.timezone}`,
+            isp: data.isp
         }
     }
 
     #updateMap(lat, lng) {
-        const zoomLevel = 13; 
+        
+        const zoomLevel = 13;
 
         if (!this.#map) {
             this.#map = L.map('map').setView([lat, lng], zoomLevel);
@@ -96,7 +114,7 @@ export class Interface {
 
             this.#marker = L.marker([lat, lng]).addTo(this.#map);
         } else {
-            this.#map.flyTo([lat, lng], zoomLevel); 
+            this.#map.flyTo([lat, lng], zoomLevel, {duration : 4});
             this.#marker.setLatLng([lat, lng]);
         }
     }

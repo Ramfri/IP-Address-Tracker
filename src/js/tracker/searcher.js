@@ -1,7 +1,6 @@
 
 export class Searcher {
-    BASEURL = 'https://geo.ipify.org/api/v2/country,city?apiKey=';
-    APIKEY = 'at_pfV1E3zfTgVAuGUz9Y056jjg0SQiC';
+    BASEURL = 'http://ip-api.com/json/';
     savedResults = {};
     searchHistory = new Set();
 
@@ -30,7 +29,7 @@ export class Searcher {
         }
 
         try {
-            const url = `${this.BASEURL}${this.APIKEY}&ipAddress=${ipAddress}`;
+            const url = `${this.BASEURL}${ipAddress}`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -38,6 +37,11 @@ export class Searcher {
             }
 
             const result = await response.json();
+
+            if (this.#validResponse(result) === false) {
+                throw new Error("Datos de la API inválidos o incompletos");
+            }
+
             this.#saveResult(ipAddress, result);
             return {
                 success: true,
@@ -49,6 +53,22 @@ export class Searcher {
                 data: {},
             }
         }
+    }
+
+    #validResponse(result) {
+        if (!result) return false;
+
+        if (result.status !== "success") return false;
+
+        if (!result.query || !result.city || !result.regionName || !result.zip || !result.timezone || !result.isp) {
+            return false;
+        }
+
+        if (result.lat === undefined || result.lon === undefined) {
+            return false;
+        }
+
+        return true;
     }
 
     #saveResult(ipAddress, result) {

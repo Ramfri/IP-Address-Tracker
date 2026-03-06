@@ -37,7 +37,11 @@ export class Tracker {
 
 
 
-            if(success === false) return this.interface.setSearchBarError();
+            if(success === false) {
+                this.interface.setSearchBarError();
+                this.interface.enabledTrigger();
+                return;
+            };
 
             this.lastSearch = searchValue;
             this.interface.removeSearchBarError();
