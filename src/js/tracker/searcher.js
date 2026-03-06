@@ -1,12 +1,8 @@
 
 export class Searcher {
-    BASEURL = 'http://ip-api.com/json/';
+    BASEURL = '/api/';
     savedResults = {};
     searchHistory = new Set();
-
-    constructor() {
-
-    }
 
     isValidSearch(searchValue) {
         if (typeof searchValue !== 'string') return false;
