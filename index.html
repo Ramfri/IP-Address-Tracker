@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  <link rel="stylesheet" href="src/styles/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <title>IP Address Tracker</title>
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="title">IP Address Tracker</h1>
+    <div class="search">
+      <input type="text" placeholder="Search for any IP address" id="searchInput">
+      <button id="searchButton"></button>
+    </div>
+
+    <div class="locationInfo">
+      <div>
+        IP ADDRESS
+        <span id="ipAddress"></span>
+      </div>
+
+      <div>
+        LOCATION
+        <span id="location"></span>
+      </div>
+
+      <div>
+        TIMEZONE
+        <span id="timezone"></span>
+      </div>
+
+      <div>
+        ISP
+        <span id="ISP"></span>
+      </div>
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+  <script type="module" src="src/js/app.js"></script>
+</body>
+
+</html>
